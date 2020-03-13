@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# throw this in a cron job to grab memory statistics periodically
+
+mem_log=/root/mem_log/mem_log
+mem_log_dir=/root/mem_log
+date_now=$(date "+%F %T %Z")
+
+if [[ ! -d "${mem_log_dir}" ]]; then
+  mkdir -v "${mem_log_dir}"
+fi
+
+echo "$date_now" >> ${mem_log} 
+cat /proc/meminfo >> ${mem_log}
+echo "" >> ${mem_log}
