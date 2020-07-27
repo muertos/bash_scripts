@@ -6,10 +6,23 @@
 
 # This configures CSF to use ipset for managing sets of IPs
 
+# TODO -- error_exit and echo_color seem to be used enough to make a bash
+#         include file of sorts for the future?
+
 error_exit() {
   # echo an error message and exit with status '1'
   echo "$1"
   exit 1
+}
+
+echo_color() {
+  # echo text using various common colors
+  # first argument is text
+  # second argument is color from the following array
+  declare -A colors=(
+    [red]="\e[31m" [green]="\e[32m" [blue]="\e[34m" [cyan]="\e[36m" [lred]="\e[91m" [lgreen]="\e[92m" [lcyan]="\e[96m"
+  )
+  echo -e "${colors[$2]}$1\e[0m"
 }
 
 add_imh_default_allow_ips() {
@@ -19,17 +32,17 @@ add_imh_default_allow_ips() {
 
   tmpdir="/tmp/csf-ded_extract_dir"
 
-  echo "downloading latest copy of IMH allow IPs from csf-ded repo"
+  echo_color "downloading latest copy of IMH allow IPs from csf-ded repo" green
   if [ ! -d "$tmpdir" ]; then
     mkdir $tmpdir && \
     cd $tmpdir && \
     yumdownloader csf-ded || error_exit "yumdownloader does not exist or failed"
     rpm2cpio csf-ded*.rpm | cpio -imd || error_exit "rpm2cpio and or cpio do not exist or failed"
     yes | cp -v $tmpdir/etc/csf/csf.allow.example /etc/csf/csf.allow
-    echo "removing $tmpdir"
+    echo_color "removing $tmpdir" green
     rm -rf "$tmpdir"
   else
-    echo "$tmpdir exists. Manually add default IMH csf.allow entries"
+    echo_color "$tmpdir exists. Manually add default IMH csf.allow entries" red
   fi
 }
 
@@ -44,9 +57,9 @@ install_csf() {
   # 'numiptent' beancounter
 
   # grab CSF package from configserver and run the install script
-  echo "installing CFS using https://download.configserver.com/csf.tgz"
+  echo_color "installing CSF using https://download.configserver.com/csf.tgz" green
   cd /usr/src && wget https://download.configserver.com/csf.tgz && tar -xzf csf.tgz && cd csf
-  ./install.cpanel.sh
+  ./install.cpanel.sh >/dev/null 2>&1
   cd ~
 
   # configure /etc/csf/csf.conf with the following
@@ -100,9 +113,10 @@ install_csf() {
   done
 
   # update CSF
-  cd /usr/src && wget http://download.configserver.com/csupdate && sed -i 's/\r//' csupdate
-  chmod +x csupdate
-  ./csupdate
+  echo_color "updating CSF using http://download.configserver.com/csupdate" green
+  cd /usr/src && wget http://download.configserver.com/csupdate && \
+    sed -i 's/\r//' csupdate && chmod +x csupdate
+  ./csupdate >/dev/null 2>&1
 }
 
 remove_apf() {
@@ -112,9 +126,9 @@ remove_apf() {
   # check for APF via 'apf-ded' package, exit if it does not exist
   rpm -q apf-ded 1>/dev/null || error_exit "APF does not exist"
 
-  echo "apf-ded found, removing"
+  echo_color "apf-ded found, removing" red
   date_now=$(date +%s)
-  echo "backing up /etc/apf to /etc/apf.bk-$date_now"
+  echo_color "backing up /etc/apf to /etc/apf.bk-$date_now" green
   cp -r /etc/apf{,.bk-$date_now}
   systemctl stop apf || service apf stop
 
