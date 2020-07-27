@@ -148,7 +148,7 @@ remove_apf() {
 }
 
 # runnning some functions in subshells so the script will exit on error
-# but won't exit script entirely 
+# but won't exit script entirely
 (remove_apf)
 install_csf
 (add_imh_default_allow_ips)
