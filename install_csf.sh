@@ -74,7 +74,7 @@ install_csf() {
     /etc/csf/csf.conf
   
   # check if we are in a VPS or dedicated server as denied IP limits will be different
-  if [[ ! -d '/proc/vz/vzaquota/' ]]; then
+  if [[ ! -d '/proc/vz/' ]]; then
    # in a dedicated server
     sed -i.bk \
       -e '/^DENY\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"15000\"/' \
