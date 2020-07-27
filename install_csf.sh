@@ -25,7 +25,7 @@ add_imh_default_allow_ips() {
     cd $tmpdir && \
     yumdownloader csf-ded || error_exit "yumdownloader does not exist or failed"
     rpm2cpio csf-ded*.rpm | cpio -imd || error_exit "rpm2cpio and or cpio do not exist or failed"
-    yes | cp -v ~/csf-ded_extract_dir/etc/csf/csf.allow.example /etc/csf/csf.allow
+    yes | cp -v $tmpdir/etc/csf/csf.allow.example /etc/csf/csf.allow
     echo "removing $tmpdir"
     rm -rf "$tmpdir"
   else
@@ -75,7 +75,7 @@ install_csf() {
     -e '/^TCP_OUT / c\TCP_OUT = "1:65535"' \
     -e '/^UDP_OUT / c\UDP_OUT = "1:65535"' \
     -e '/^UDP_IN /s/"/,33434:33529"/2' \
-    -e '/^LF_IPSET /s/0/1/'
+    -e '/^LF_IPSET /s/0/1/' \
     /etc/csf/csf.conf
 
   # check if we are in a VPS or dedicated server as denied IP limits will be different
