@@ -9,6 +9,9 @@
 # TODO -- error_exit and echo_color seem to be used enough to make a bash
 #         include file of sorts for the future?
 
+# TODO -- if APF found, grab allowed and denied IPs from APF and move into
+#         CSF
+
 error_exit() {
   # echo an error message and exit with status '1'
   echo "$1"
