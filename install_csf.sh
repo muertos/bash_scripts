@@ -10,7 +10,7 @@
 #         include file of sorts for the future?
 
 # TODO -- if APF found, grab allowed and denied IPs from APF and move into
-#         CSF
+#         CSF, and mirror the opened and closed port ranges for TCP and UDP
 
 error_exit() {
   # echo an error message and exit with status '1'
