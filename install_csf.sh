@@ -4,6 +4,8 @@
 # and removes APF and the "Add IP to Firewall" WHM
 # plugin
 
+# This configures CSF to use ipset for managing sets of IPs
+
 error_exit() {
   # echo an error message and exit with status '1'
   echo "$1"
@@ -32,11 +34,11 @@ add_imh_default_allow_ips() {
 }
 
 install_csf() {
-  # TODO -- set lf_ipset = "1" and find out best number for "DENY_IP_LIMIT" for VZ VPS containers
+  # TODO -- set LF_IPSET = "1" and find out best number for "DENY_IP_LIMIT" for VZ VPS containers
   #         it appears that with VZ7, ipset works and CSF allows use of ipset,
   #         so many more IPs can be added to iptables via ipset
 
-  # TODO -- set lf_ipset = "1" for dedicated servers as well?
+  # TODO -- set LF_IPSET = "1" for dedicated servers as well?
 
   # current limit for imh setup for number of iptables rules is 3000 via the
   # 'numiptent' beancounter
@@ -73,7 +75,7 @@ install_csf() {
     -e '/^TCP_OUT / c\TCP_OUT = "1:65535"' \
     -e '/^UDP_OUT / c\UDP_OUT = "1:65535"' \
     -e '/^UDP_IN /s/"/,33434:33529"/2' \
-    -e '/^lf_ipset/s/0/1/'
+    -e '/^LF_IPSET /s/0/1/'
     /etc/csf/csf.conf
 
   # check if we are in a VPS or dedicated server as denied IP limits will be different
