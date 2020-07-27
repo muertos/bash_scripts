@@ -51,8 +51,6 @@ install_csf() {
   #         it appears that with VZ7, ipset works and CSF allows use of ipset,
   #         so many more IPs can be added to iptables via ipset
 
-  # TODO -- set LF_IPSET = "1" for dedicated servers as well?
-
   # current limit for imh setup for number of iptables rules is 3000 via the
   # 'numiptent' beancounter
 
@@ -101,7 +99,7 @@ install_csf() {
   else
     # in a VPS
     sed -i.bk -e \
-      '/^DENY\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"2500\"/' \
+      '/^DENY\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"50000\"/' \
       -e '/^DENY\_TEMP\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"500\"/' \
       /etc/csf/csf.conf
   fi
