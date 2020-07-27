@@ -24,7 +24,8 @@ add_imh_default_allow_ips() {
     yumdownloader csf-ded || error_exit "yumdownloader does not exist or failed"
     rpm2cpio csf-ded*.rpm | cpio -imd || error_exit "rpm2cpio and or cpio do not exist or failed"
     yes | cp -v ~/csf-ded_extract_dir/etc/csf/csf.allow.example /etc/csf/csf.allow
-    rm -rfv "$tmpdir"
+    echo "removing $tmpdir"
+    rm -rf "$tmpdir"
   else
     echo "$tmpdir exists. Manually add default IMH csf.allow entries"
   fi
@@ -41,6 +42,7 @@ install_csf() {
   # 'numiptent' beancounter
 
   # grab CSF package from configserver and run the install script
+  echo "installing CFS using https://download.configserver.com/csf.tgz"
   cd /usr/src && wget https://download.configserver.com/csf.tgz && tar -xzf csf.tgz && cd csf
   ./install.cpanel.sh
   cd ~
@@ -71,8 +73,9 @@ install_csf() {
     -e '/^TCP_OUT / c\TCP_OUT = "1:65535"' \
     -e '/^UDP_OUT / c\UDP_OUT = "1:65535"' \
     -e '/^UDP_IN /s/"/,33434:33529"/2' \
+    -e '/^lf_ipset/s/0/1/'
     /etc/csf/csf.conf
-  
+
   # check if we are in a VPS or dedicated server as denied IP limits will be different
   if [[ ! -d '/proc/vz/' ]]; then
    # in a dedicated server
@@ -105,8 +108,9 @@ remove_apf() {
   # removes APF if exists and "Add IP to Firewall" WHM plugin
 
   # check for APF via 'apf-ded' package, exit if it does not exist
-  rpm -q apf-ded || error_exit "APF does not exist"
+  rpm -q apf-ded 1>/dev/null || error_exit "APF does not exist"
 
+  echo "apf-ded found, removing"
   date_now=$(date +%s)
   echo "backing up /etc/apf to /etc/apf.bk-$date_now"
   cp -r /etc/apf{,.bk-$date_now}
@@ -114,12 +118,12 @@ remove_apf() {
 
   # remove apf check from tailwatch, remove APF
   chkconfig --del apf
-  rm -rfv /etc/init.d/apf \
-          /usr/local/sbin/apf \
-          /etc/apf \
-          /usr/local/cpanel/whostmgr/cgi/{apfadd,addon_add2apf.cgi} \
-          /usr/local/cpanel/whostmgr/cgi/apfadd \
-          /usr/local/cpanel/whostmgr/cgi/addon_add2apf.cgi
+  rm -rf /etc/init.d/apf \
+         /usr/local/sbin/apf \
+         /etc/apf \
+         /usr/local/cpanel/whostmgr/cgi/{apfadd,addon_add2apf.cgi} \
+         /usr/local/cpanel/whostmgr/cgi/apfadd \
+         /usr/local/cpanel/whostmgr/cgi/addon_add2apf.cgi
 
   yum -y remove apf-ded whm-addip
   cp /var/cpanel/pluginscache.yaml{,.bk$(date +%F)} && \
