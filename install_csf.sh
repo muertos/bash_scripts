@@ -102,10 +102,14 @@ install_csf() {
   else
     # in a VPS
     sed -i.bk -e \
-      '/^DENY\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"50000\"/' \
+      '/^DENY\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"2000\"/' \
       -e '/^DENY\_TEMP\_IP\_LIMIT \=/ s/\"[0-9]*\"/\"500\"/' \
       /etc/csf/csf.conf
   fi
+
+  # TODO: VZ7 and ipset do seem to work together now, allowing many more IPs
+  # to be added to iptables, consider testing this further and updating this
+  # script to deny a greater amount of IPs
 
   # ensure resellers have CSF plugin in WHM
   for reseller in $(cat /var/cpanel/resellers | awk -F':' {'print $1'})
